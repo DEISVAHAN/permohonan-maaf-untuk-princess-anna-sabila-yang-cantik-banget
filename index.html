@@ -106,7 +106,7 @@
                     🔄 Foto Ulang
                 </button>
                 <button id="sendWaBtn" onclick="sendToWhatsApp()" class="hidden w-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-2.5 px-4 rounded-xl shadow-md text-sm transition flex items-center justify-center space-x-2">
-                    <span>📲 Kirim ke WhatsApp (085786243667)</span>
+                    <span>📲 Bagikan Foto & Kirim ke WhatsApp</span>
                 </button>
             </div>
         </div>
@@ -116,6 +116,7 @@
     <script>
         let stream = null;
         let photoTaken = false;
+        let capturedBlob = null;
 
         // Coba putar musik secara otomatis saat halaman dimuat
         window.addEventListener('DOMContentLoaded', () => {
@@ -174,6 +175,11 @@
             video.classList.add('hidden');
             canvas.classList.remove('hidden');
 
+            // Ubah canvas menjadi file Blob agar bisa dibagikan sebagai file gambar nyata
+            canvas.toBlob(function(blob) {
+                capturedBlob = blob;
+            }, 'image/png');
+
             // Hentikan stream kamera setelah foto diambil
             if (stream) {
                 stream.getTracks().forEach(track => track.stop());
@@ -200,15 +206,36 @@
             }
 
             photoTaken = false;
+            capturedBlob = null;
             document.getElementById('captureBtn').classList.remove('hidden');
             document.getElementById('retakeBtn').classList.add('hidden');
             document.getElementById('sendWaBtn').classList.add('hidden');
         }
 
-        function sendToWhatsApp() {
+        async function sendToWhatsApp() {
+            const messageText = "Hai Princess Anna! Nih foto selfie terbaru biar tau kalau aku udah gak badmood lagi. Maafin aku ya! 💖✨";
+            
+            if (navigator.canShare && capturedBlob) {
+                const file = new File([capturedBlob], "photobox-anna.png", { type: "image/png" });
+                const shareData = {
+                    title: "Selfie Photobox Princess Anna",
+                    text: messageText,
+                    files: [file]
+                };
+
+                if (navigator.canShare(shareData)) {
+                    try {
+                        await navigator.share(shareData);
+                        return;
+                    } catch (err) {
+                        console.log("Pengguna membatalkan berbagi atau terjadi kesalahan:", err);
+                    }
+                }
+            }
+
+            // Fallback jika browser/perangkat tidak mendukung Web Share API file
             const phoneNumber = "6285786243667";
-            const message = encodeURIComponent("Hai Princess Anna! Nih foto selfie terbaru biar tau kalau aku udah gak badmood lagi. Maafin aku ya! 💖✨");
-            const waUrl = `https://wa.me/${phoneNumber}?text=${message}`;
+            const waUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(messageText)}`;
             window.open(waUrl, '_blank');
         }
 
