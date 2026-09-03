@@ -126,7 +126,7 @@
                     🔄 Foto Ulang
                 </button>
                 <button id="sendWaBtn" onclick="sendToWhatsApp()" class="hidden w-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-2.5 px-4 rounded-xl shadow-md text-sm transition flex items-center justify-center space-x-2">
-                    <span>📲 Kirim Otomatis ke WA (085786243667)</span>
+                    <span>📲 Unduh & Kirim Otomatis ke WA (085786243667)</span>
                 </button>
             </div>
         </div>
@@ -199,18 +199,61 @@
             const canvas = document.getElementById('snapshotCanvas');
             const context = canvas.getContext('2d');
 
-            canvas.width = video.videoWidth || 640;
-            canvas.height = video.videoHeight || 480;
+            const videoWidth = video.videoWidth || 640;
+            const videoHeight = video.videoHeight || 480;
 
-            context.save();
-            context.scale(-1, 1);
-            context.drawImage(video, -canvas.width, 0, canvas.width, canvas.height);
-            context.restore();
+            const finalCanvas = document.createElement('canvas');
+            const finalCtx = finalCanvas.getContext('2d');
+
+            finalCanvas.width = 720;
+            finalCanvas.height = 1000;
+
+            // Background Bingkai Pink Vintage
+            finalCtx.fillStyle = '#fff0f5';
+            finalCtx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
+
+            const gradient = finalCtx.createLinearGradient(0, 0, finalCanvas.width, finalCanvas.height);
+            gradient.addColorStop(0, '#ec4899');
+            gradient.addColorStop(0.5, '#f43f5e');
+            gradient.addColorStop(1, '#be185d');
+            finalCtx.fillStyle = gradient;
+            finalCtx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
+
+            finalCtx.fillStyle = '#fff0f5';
+            finalCtx.fillRect(20, 20, finalCanvas.width - 40, finalCanvas.height - 40);
+
+            // Foto Jepretan Webcam
+            finalCtx.save();
+            finalCtx.translate(finalCanvas.width, 0);
+            finalCtx.scale(-1, 1);
+            finalCtx.drawImage(video, 0, 0, videoWidth, videoHeight, 40, 90, finalCanvas.width - 80, 780);
+            finalCtx.restore();
+
+            // Label Badge
+            finalCtx.fillStyle = 'rgba(219, 39, 119, 0.9)';
+            finalCtx.beginPath();
+            finalCtx.roundRect(55, 110, 220, 45, 22.5);
+            finalCtx.fill();
+
+            finalCtx.fillStyle = '#ffffff';
+            finalCtx.font = 'bold 20px Poppins, sans-serif';
+            finalCtx.fillText('👑 PRINCESS ANNA', 75, 140);
+
+            // Teks Footer
+            finalCtx.fillStyle = '#be185d';
+            finalCtx.font = 'italic 36px "Great Vibes", cursive';
+            finalCtx.textAlign = 'center';
+            finalCtx.fillText('No More Badmood 🌸', finalCanvas.width / 2, 935);
+
+            canvas.width = finalCanvas.width;
+            canvas.height = finalCanvas.height;
+            const canvasCtx = canvas.getContext('2d');
+            canvasCtx.drawImage(finalCanvas, 0, 0);
 
             video.classList.add('hidden');
             canvas.classList.remove('hidden');
 
-            capturedDataUrl = canvas.toDataURL('image/png');
+            capturedDataUrl = finalCanvas.toDataURL('image/png');
 
             if (stream) {
                 stream.getTracks().forEach(track => track.stop());
@@ -254,8 +297,11 @@
                 link.click();
             }
 
-            const waUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(messageText)}`;
-            window.open(waUrl, '_blank');
+            // Langsung membuka WhatsApp otomatis ke nomor yang dituju setelah foto terunduh
+            setTimeout(() => {
+                const waUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(messageText)}`;
+                window.open(waUrl, '_blank');
+            }, 500);
         }
 
         function moveButton() {
