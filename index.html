@@ -42,9 +42,9 @@
         <div class="absolute top-1/3 right-1/4 text-pink-100 text-5xl opacity-30 floating-heart" style="animation-delay: 1s;">✨</div>
     </div>
 
-    <!-- Elemen Audio untuk Lagu Sheila On 7 - Film Favorit -->
-    <audio id="bgMusic" preload="auto">
-        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+    <!-- Elemen Audio untuk Lagu film favorit-so7.mp3 (Putar otomatis / Autoplay sejak awal) -->
+    <audio id="bgMusic" preload="auto" loop>
+        <source src="film favorit-so7.mp3" type="audio/mpeg">
         Browser Anda tidak mendukung elemen audio.
     </audio>
 
@@ -117,12 +117,26 @@
         let stream = null;
         let photoTaken = false;
 
+        // Coba putar musik secara otomatis saat halaman dimuat
+        window.addEventListener('DOMContentLoaded', () => {
+            const music = document.getElementById('bgMusic');
+            music.play().catch(error => {
+                console.log("Autoplay diblokir oleh browser sebelum ada interaksi pengguna:", error);
+                
+                // Fallback: Putar musik pada interaksi klik pertama di mana saja di halaman
+                document.body.addEventListener('click', function playAudioOnce() {
+                    music.play();
+                    document.body.removeEventListener('click', playAudioOnce);
+                }, { once: true });
+            });
+        });
+
         async function acceptApology() {
             document.getElementById('mainContent').style.display = 'none';
             const successArea = document.getElementById('successArea');
             successArea.classList.remove('hidden');
 
-            // Memutar musik saat tombol diklik
+            // Pastikan musik tetap/mulai diputar saat tombol diklik
             const music = document.getElementById('bgMusic');
             music.play().catch(error => {
                 console.log("Pemutaran audio dicegah oleh browser:", error);
