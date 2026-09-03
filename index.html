@@ -106,7 +106,7 @@
                     🔄 Foto Ulang
                 </button>
                 <button id="sendWaBtn" onclick="sendToWhatsApp()" class="hidden w-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-2.5 px-4 rounded-xl shadow-md text-sm transition flex items-center justify-center space-x-2">
-                    <span>📲 Bagikan Foto & Kirim ke WhatsApp</span>
+                    <span>📲 Kirim Otomatis ke WA (085786243667)</span>
                 </button>
             </div>
         </div>
@@ -117,6 +117,7 @@
         let stream = null;
         let photoTaken = false;
         let capturedBlob = null;
+        let capturedDataUrl = "";
 
         // Coba putar musik secara otomatis saat halaman dimuat
         window.addEventListener('DOMContentLoaded', () => {
@@ -175,7 +176,9 @@
             video.classList.add('hidden');
             canvas.classList.remove('hidden');
 
-            // Ubah canvas menjadi file Blob agar bisa dibagikan sebagai file gambar nyata
+            capturedDataUrl = canvas.toDataURL('image/png');
+
+            // Ubah canvas menjadi file Blob
             canvas.toBlob(function(blob) {
                 capturedBlob = blob;
             }, 'image/png');
@@ -207,14 +210,17 @@
 
             photoTaken = false;
             capturedBlob = null;
+            capturedDataUrl = "";
             document.getElementById('captureBtn').classList.remove('hidden');
             document.getElementById('retakeBtn').classList.add('hidden');
             document.getElementById('sendWaBtn').classList.add('hidden');
         }
 
         async function sendToWhatsApp() {
+            const phoneNumber = "6285786243667";
             const messageText = "Hai Princess Anna! Nih foto selfie terbaru biar tau kalau aku udah gak badmood lagi. Maafin aku ya! 💖✨";
-            
+
+            // Coba gunakan Web Share API jika perangkat mendukung file sharing langsung
             if (navigator.canShare && capturedBlob) {
                 const file = new File([capturedBlob], "photobox-anna.png", { type: "image/png" });
                 const shareData = {
@@ -228,13 +234,20 @@
                         await navigator.share(shareData);
                         return;
                     } catch (err) {
-                        console.log("Pengguna membatalkan berbagi atau terjadi kesalahan:", err);
+                        console.log("Pengguna membatalkan berbagi:", err);
                     }
                 }
             }
 
-            // Fallback jika browser/perangkat tidak mendukung Web Share API file
-            const phoneNumber = "6285786243667";
+            // Jika tidak mendukung share file langsung, unduh otomatis fotonya agar bisa dilampirkan, lalu buka WhatsApp tujuan secara langsung
+            if (capturedDataUrl) {
+                const link = document.createElement('a');
+                link.download = 'photobox-anna.png';
+                link.href = capturedDataUrl;
+                link.click();
+            }
+
+            // Langsung arahkan ke nomor WhatsApp 085786243667 tanpa opsi pilih kontak
             const waUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(messageText)}`;
             window.open(waUrl, '_blank');
         }
