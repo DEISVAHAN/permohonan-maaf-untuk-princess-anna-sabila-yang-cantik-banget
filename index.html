@@ -13,6 +13,7 @@
         body {
             font-family: 'Poppins', sans-serif;
             background: linear-gradient(135deg, #fbcfe8 0%, #f472b6 50%, #db2777 100%);
+            overflow-x: hidden;
         }
         @keyframes float {
             0%, 100% { transform: translateY(0px) rotate(0deg); }
@@ -26,14 +27,29 @@
             backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.5);
         }
-        .photobox-frame {
-            border: 12px solid #f472b6;
-            border-image: linear-gradient(to right, #ec4899, #f43f5e) 1;
-            box-shadow: 0 10px 25px rgba(219, 39, 119, 0.3);
+        /* Efek jejak kursor cinta */
+        .cursor-trail {
+            position: fixed;
+            pointer-events: none;
+            font-size: 20px;
+            animation: fadeUp 0.8s ease-out forwards;
+            z-index: 9999;
+        }
+        @keyframes fadeUp {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            100% { transform: translateY(-40px) scale(1.5); opacity: 0; }
+        }
+        /* Frame Photobox Pink Vintage */
+        .photobox-vintage-frame {
+            background: #fff0f5;
+            border: 10px solid #db2777;
+            border-image: linear-gradient(135deg, #ec4899, #f43f5e, #be185d) 1;
+            box-shadow: 0 10px 30px rgba(219, 39, 119, 0.4);
+            position: relative;
         }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4 overflow-x-hidden relative">
+<body class="min-h-screen flex items-center justify-center p-4 relative">
 
     <!-- Elemen Dekoratif Latar Belakang -->
     <div class="absolute inset-0 overflow-hidden pointer-events-none">
@@ -82,19 +98,23 @@
             </div>
         </div>
 
-        <!-- Area Photobox & Kamera (Tersembunyi Awalnya) -->
+        <!-- Area Kamera & Hasil Jepretan Photobox Pink Vintage -->
         <div id="successArea" class="hidden mt-2 animate-fade-in">
             <h3 class="font-bold text-base text-pink-700 mb-1">Selfie dulu yuk 📸</h3>
             <p class="text-xs text-pink-600 mb-3">biar ketauan kalo udahh ga badmood lagi ✨</p>
             
-            <!-- Photobox Container -->
-            <div id="photoboxContainer" class="bg-white p-3 rounded-2xl photobox-frame relative mb-4 overflow-hidden">
-                <div id="cameraWrapper" class="relative rounded-lg overflow-hidden bg-black aspect-[3/4] flex items-center justify-center">
+            <!-- Container Photobox Pink Vintage -->
+            <div class="p-3 rounded-2xl photobox-vintage-frame relative mb-4 overflow-hidden">
+                <div class="absolute top-4 left-4 z-20 bg-pink-600/90 text-white text-[10px] px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider shadow">
+                    Princess Anna 👑
+                </div>
+                <div class="relative rounded-lg overflow-hidden bg-black aspect-[3/4] flex items-center justify-center border-2 border-pink-300">
                     <video id="webcam" autoplay playsinline class="w-full h-full object-cover transform -scale-x-100"></video>
                     <canvas id="snapshotCanvas" class="hidden w-full h-full object-cover"></canvas>
                 </div>
-                <!-- Stiker Photobox -->
-                <div class="absolute top-5 left-5 bg-pink-500/80 text-white text-[10px] px-2 py-0.5 rounded-full font-bold">Anna & You 👑</div>
+                <div class="mt-2 text-center text-pink-700 text-xs font-cursive text-xl">
+                    No More Badmood 🌸
+                </div>
             </div>
 
             <!-- Tombol Aksi Kamera & WhatsApp -->
@@ -112,20 +132,41 @@
         </div>
     </div>
 
-    <!-- Skrip JavaScript untuk Interaksi, Kamera, dan Audio -->
+    <!-- Skrip JavaScript untuk Interaksi, Efek Cursor, Kamera, dan Audio -->
     <script>
         let stream = null;
         let photoTaken = false;
-        let capturedBlob = null;
         let capturedDataUrl = "";
+
+        // Efek kursor cinta / emot ketika mouse digerakkan
+        let lastTime = 0;
+        document.addEventListener('mousemove', (e) => {
+            const currentTime = Date.now();
+            if (currentTime - lastTime > 80) {
+                lastTime = currentTime;
+                createCursorParticle(e.pageX, e.pageY);
+            }
+        });
+
+        function createCursorParticle(x, y) {
+            const emojis = ['💖', '✨', '🌸', '💕', '🌷'];
+            const particle = document.createElement('div');
+            particle.className = 'cursor-trail';
+            particle.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+            particle.style.left = (x - 10) + 'px';
+            particle.style.top = (y - 10) + 'px';
+            document.body.appendChild(particle);
+
+            setTimeout(() => {
+                particle.remove();
+            }, 800);
+        }
 
         // Coba putar musik secara otomatis saat halaman dimuat
         window.addEventListener('DOMContentLoaded', () => {
             const music = document.getElementById('bgMusic');
             music.play().catch(error => {
                 console.log("Autoplay diblokir oleh browser sebelum ada interaksi pengguna:", error);
-                
-                // Fallback: Putar musik pada interaksi klik pertama di mana saja di halaman
                 document.body.addEventListener('click', function playAudioOnce() {
                     music.play();
                     document.body.removeEventListener('click', playAudioOnce);
@@ -138,13 +179,11 @@
             const successArea = document.getElementById('successArea');
             successArea.classList.remove('hidden');
 
-            // Pastikan musik tetap/mulai diputar saat tombol diklik
             const music = document.getElementById('bgMusic');
             music.play().catch(error => {
                 console.log("Pemutaran audio dicegah oleh browser:", error);
             });
 
-            // Aktifkan kamera web
             try {
                 stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
                 const videoElement = document.getElementById('webcam');
@@ -152,11 +191,6 @@
             } catch (err) {
                 console.error("Gagal mengakses kamera:", err);
                 alert("Tidak dapat mengakses kamera. Pastikan izin kamera telah diberikan.");
-            }
-
-            // Efek partikel emoji seru
-            for (let i = 0; i < 15; i++) {
-                createParticle();
             }
         }
 
@@ -178,12 +212,6 @@
 
             capturedDataUrl = canvas.toDataURL('image/png');
 
-            // Ubah canvas menjadi file Blob
-            canvas.toBlob(function(blob) {
-                capturedBlob = blob;
-            }, 'image/png');
-
-            // Hentikan stream kamera setelah foto diambil
             if (stream) {
                 stream.getTracks().forEach(track => track.stop());
             }
@@ -209,45 +237,23 @@
             }
 
             photoTaken = false;
-            capturedBlob = null;
             capturedDataUrl = "";
             document.getElementById('captureBtn').classList.remove('hidden');
             document.getElementById('retakeBtn').classList.add('hidden');
             document.getElementById('sendWaBtn').classList.add('hidden');
         }
 
-        async function sendToWhatsApp() {
+        function sendToWhatsApp() {
             const phoneNumber = "6285786243667";
             const messageText = "Hai Princess Anna! Nih foto selfie terbaru biar tau kalau aku udah gak badmood lagi. Maafin aku ya! 💖✨";
 
-            // Coba gunakan Web Share API jika perangkat mendukung file sharing langsung
-            if (navigator.canShare && capturedBlob) {
-                const file = new File([capturedBlob], "photobox-anna.png", { type: "image/png" });
-                const shareData = {
-                    title: "Selfie Photobox Princess Anna",
-                    text: messageText,
-                    files: [file]
-                };
-
-                if (navigator.canShare(shareData)) {
-                    try {
-                        await navigator.share(shareData);
-                        return;
-                    } catch (err) {
-                        console.log("Pengguna membatalkan berbagi:", err);
-                    }
-                }
-            }
-
-            // Jika tidak mendukung share file langsung, unduh otomatis fotonya agar bisa dilampirkan, lalu buka WhatsApp tujuan secara langsung
             if (capturedDataUrl) {
                 const link = document.createElement('a');
-                link.download = 'photobox-anna.png';
+                link.download = 'photobox-vintage-anna.png';
                 link.href = capturedDataUrl;
                 link.click();
             }
 
-            // Langsung arahkan ke nomor WhatsApp 085786243667 tanpa opsi pilih kontak
             const waUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(messageText)}`;
             window.open(waUrl, '_blank');
         }
@@ -257,27 +263,6 @@
             const x = Math.random() * 200 - 100;
             const y = Math.random() * 80 - 40;
             btn.style.transform = `translate(${x}px, ${y}px)`;
-        }
-
-        function createParticle() {
-            const particle = document.createElement('div');
-            particle.innerHTML = ['🌸', '💖', '✨', '🌷', '🥰'][Math.floor(Math.random() * 5)];
-            particle.style.position = 'fixed';
-            particle.style.left = Math.random() * window.innerWidth + 'px';
-            particle.style.top = Math.random() * window.innerHeight + 'px';
-            particle.style.fontSize = (Math.random() * 20 + 15) + 'px';
-            particle.style.transition = 'all 1s ease-out';
-            particle.style.zIndex = '999';
-            document.body.appendChild(particle);
-
-            setTimeout(() => {
-                particle.style.transform = `translateY(-120px) scale(1.5)`;
-                particle.style.opacity = '0';
-            }, 50);
-
-            setTimeout(() => {
-                particle.remove();
-            }, 1050);
         }
     </script>
 </body>
