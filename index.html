@@ -174,7 +174,7 @@
                 </div>
             </div>
 
-            <!-- Tombol Aksi Kamera & WhatsApp -->
+            <!-- Tombol Aksi Kamera & Unduh -->
             <div class="space-y-2">
                 <button id="captureBtn" onclick="takeSnapshot()" class="w-full bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-semibold py-2.5 px-4 rounded-xl shadow-md text-sm transition">
                     ✨ Ambil Foto (Snap!)
@@ -182,9 +182,21 @@
                 <button id="retakeBtn" onclick="retakePhoto()" class="hidden w-full bg-white text-pink-600 border border-pink-300 font-semibold py-2 px-4 rounded-xl shadow-sm text-sm transition hover:bg-pink-50">
                     🔄 Foto Ulang
                 </button>
-                <button id="sendWaBtn" onclick="sendToWhatsApp()" class="hidden w-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-2.5 px-4 rounded-xl shadow-md text-sm transition flex items-center justify-center space-x-2">
-                    <span>📲 Unduh & Kirim Otomatis ke WA (085786243667)</span>
+                <button id="downloadBtn" onclick="downloadPhoto()" class="hidden w-full bg-pink-600 hover:bg-pink-700 text-white font-semibold py-2.5 px-4 rounded-xl shadow-md text-sm transition flex items-center justify-center space-x-2">
+                    <span>📥 Unduh & Simpan Foto Photobox</span>
                 </button>
+            </div>
+        </div>
+
+        <!-- Tahap 4: Halaman Sukses Setelah Unduh (Tersembunyi Awalnya) -->
+        <div id="finalSuccessPage" class="hidden mt-4 bg-pink-50/90 rounded-2xl p-6 border border-pink-200 shadow-inner text-center animate-fade-in">
+            <span class="text-5xl block mb-2">🎉💖✨</span>
+            <h3 class="font-bold text-lg text-pink-700 mb-1">Yeay, Berhasil Baikan!</h3>
+            <p class="text-xs text-gray-700 leading-relaxed mb-4">
+                Foto kenangan berbingkai vintage telah tersimpan di perangkatmu. Terima kasih karena Princess Anna sudah memaafkan dan tersenyum kembali! 🥰
+            </p>
+            <div class="text-xs text-pink-600 font-semibold italic">
+                "Senyumanmu adalah hal terindah di dunia." 🌸
             </div>
         </div>
     </div>
@@ -385,7 +397,7 @@
             photoTaken = true;
             document.getElementById('captureBtn').classList.add('hidden');
             document.getElementById('retakeBtn').classList.remove('hidden');
-            document.getElementById('sendWaBtn').classList.remove('hidden');
+            document.getElementById('downloadBtn').classList.remove('hidden');
         }
 
         async function retakePhoto() {
@@ -407,14 +419,11 @@
             capturedDataUrl = "";
             document.getElementById('captureBtn').classList.remove('hidden');
             document.getElementById('retakeBtn').classList.add('hidden');
-            document.getElementById('sendWaBtn').classList.add('hidden');
+            document.getElementById('downloadBtn').classList.add('hidden');
         }
 
-        function sendToWhatsApp() {
+        function downloadPhoto() {
             playSound('magic');
-            const phoneNumber = "6285786243667";
-            const messageText = "Hai Princess Anna! Nih foto selfie terbaru biar tau kalau aku udah gak badmood lagi. Maafin aku ya! 💖✨";
-
             if (capturedDataUrl) {
                 const link = document.createElement('a');
                 link.download = 'photobox-vintage-anna.png';
@@ -422,9 +431,10 @@
                 link.click();
             }
 
+            // Alih-alih membuka WhatsApp, arahkan ke halaman sukses terakhir
             setTimeout(() => {
-                const waUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(messageText)}`;
-                window.open(waUrl, '_blank');
+                document.getElementById('successArea').style.display = 'none';
+                document.getElementById('finalSuccessPage').classList.remove('hidden');
             }, 600);
         }
 
