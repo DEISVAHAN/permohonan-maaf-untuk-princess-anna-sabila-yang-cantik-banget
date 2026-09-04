@@ -57,6 +57,14 @@
             box-shadow: 0 10px 30px rgba(219, 39, 119, 0.4);
             position: relative;
         }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-6px); }
+            40%, 80% { transform: translateX(6px); }
+        }
+        .shake-anim {
+            animation: shake 0.4s ease-in-out;
+        }
     </style>
 </head>
 <body class="flex items-center justify-center p-4 relative">
@@ -97,10 +105,11 @@
                 <button onclick="nextQuizPage(2)" class="w-full bg-white hover:bg-pink-100 text-pink-700 border border-pink-200 text-xs font-medium py-2.5 px-4 rounded-xl shadow-sm transition text-left">
                     A. Jelas banget, kamu (yang bikin permohonan maaf ini) 🥺
                 </button>
-                <button onclick="nextQuizPage(2)" class="w-full bg-white hover:bg-pink-100 text-pink-700 border border-pink-200 text-xs font-medium py-2.5 px-4 rounded-xl shadow-sm transition text-left">
+                <button id="wrongBtn1" onclick="handleWrongChoice(this, 'Eits, salah! Mana boleh pilih tukang ojek online! 🛵💨')" class="w-full bg-white hover:bg-pink-100 text-pink-700 border border-pink-200 text-xs font-medium py-2.5 px-4 rounded-xl shadow-sm transition text-left relative">
                     B. Tukang ojek online langganan 🛵
                 </button>
             </div>
+            <p id="errorMsg1" class="text-[11px] text-rose-600 font-semibold mt-2 h-4 text-center"></p>
         </div>
 
         <!-- Kuis Page 2 (Tersembunyi Awalnya) -->
@@ -111,13 +120,14 @@
             </div>
             <p class="text-xs text-gray-700 font-medium mb-3">Pertanyaan kedua: Kalau Princess Anna senyum lagi, dunia rasanya jadi...</p>
             <div class="space-y-2">
-                <button onclick="finishQuiz()" class="w-full bg-white hover:bg-pink-100 text-pink-700 border border-pink-200 text-xs font-medium py-2.5 px-4 rounded-xl shadow-sm transition text-left">
+                <button id="wrongBtn2" onclick="handleWrongChoice(this, 'Kurang tepat, Yang Mulia! Mana bisa biasa aja 🥱')" class="w-full bg-white hover:bg-pink-100 text-pink-700 border border-pink-200 text-xs font-medium py-2.5 px-4 rounded-xl shadow-sm transition text-left relative">
                     A. Biasa aja sih 🥱
                 </button>
                 <button onclick="finishQuiz()" class="w-full bg-white hover:bg-pink-100 text-pink-700 border border-pink-200 text-xs font-medium py-2.5 px-4 rounded-xl shadow-sm transition text-left">
                     B. Jauh lebih cerah dan indah banget ✨
                 </button>
             </div>
+            <p id="errorMsg2" class="text-[11px] text-rose-600 font-semibold mt-2 h-4 text-center"></p>
         </div>
 
         <!-- Tahap 2: Kartu Pesan Utama (Terkunci Awalnya) -->
@@ -196,7 +206,7 @@
                 Foto kenangan berbingkai vintage telah tersimpan di perangkatmu. Terima kasih karena Princess Anna sudah memaafkan dan tersenyum kembali! 🥰
             </p>
             
-            <!-- Tombol Mengunduh File yang Diunggah: Jurnal Anna Cantik.pdf -->
+            <!-- Tombol Unduh File Jurnal Anna Cantik.pdf -->
             <a href="Jurnal Anna Cantik.pdf" download="Jurnal Anna Cantik.pdf" onclick="playSound('magic')" class="w-full bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white font-semibold py-2.5 px-4 rounded-xl shadow-md text-sm transition flex items-center justify-center space-x-2 no-underline">
                 <span>📄 Unduh Jurnal Anna Cantik (.PDF)</span>
             </a>
@@ -250,6 +260,22 @@
             star.style.left = Math.random() * 100 + '%';
             star.style.animationDelay = (Math.random() * 3) + 's';
             starContainer.appendChild(star);
+        }
+
+        // Logika Penolakan Pilihan yang Salah dengan Gaya Lucu
+        function handleWrongChoice(btn, message) {
+            playSound('pop');
+            btn.classList.add('shake-anim');
+            setTimeout(() => {
+                btn.classList.remove('shake-anim');
+            }, 400);
+
+            // Tentukan halaman aktif untuk menampilkan pesan error
+            if (btn.id === 'wrongBtn1') {
+                document.getElementById('errorMsg1').innerText = message;
+            } else if (btn.id === 'wrongBtn2') {
+                document.getElementById('errorMsg2').innerText = message;
+            }
         }
 
         // Logika Perpindahan Halaman Kuis
