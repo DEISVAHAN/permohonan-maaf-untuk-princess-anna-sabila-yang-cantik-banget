@@ -14,6 +14,7 @@
             font-family: 'Poppins', sans-serif;
             background: linear-gradient(135deg, #fbcfe8 0%, #f472b6 50%, #db2777 100%);
             overflow-x: hidden;
+            min-height: 100vh;
         }
         @keyframes float {
             0%, 100% { transform: translateY(0px) rotate(0deg); }
@@ -22,10 +23,19 @@
         .floating-heart {
             animation: float 4s ease-in-out infinite;
         }
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.2; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+        .star {
+            position: absolute;
+            animation: twinkle 3s ease-in-out infinite;
+        }
         .glass-panel {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 20px 40px rgba(219, 39, 119, 0.25);
         }
         /* Efek jejak kursor cinta */
         .cursor-trail {
@@ -49,39 +59,69 @@
         }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4 relative">
+<body class="flex items-center justify-center p-4 relative">
 
-    <!-- Elemen Dekoratif Latar Belakang -->
-    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+    <!-- Latar Belakang Bintang & Dekorasi -->
+    <div class="absolute inset-0 overflow-hidden pointer-events-none" id="starContainer">
         <div class="absolute top-10 left-10 text-pink-200 text-6xl opacity-40 floating-heart">🌸</div>
         <div class="absolute bottom-10 right-10 text-pink-200 text-7xl opacity-40 floating-heart" style="animation-delay: 2s;">💖</div>
         <div class="absolute top-1/3 right-1/4 text-pink-100 text-5xl opacity-30 floating-heart" style="animation-delay: 1s;">✨</div>
     </div>
 
-    <!-- Elemen Audio untuk Lagu film favorit-so7.mp3 (Putar otomatis / Autoplay sejak awal) -->
+    <!-- Elemen Audio untuk Lagu film favorit-so7.mp3 -->
     <audio id="bgMusic" preload="auto" loop>
         <source src="film favorit-so7.mp3" type="audio/mpeg">
         Browser Anda tidak mendukung elemen audio.
     </audio>
 
-    <div class="max-w-md w-full glass-panel rounded-3xl shadow-2xl p-6 sm:p-8 text-center relative z-10 transition-all duration-500">
+    <div class="max-w-md w-full glass-panel rounded-3xl p-6 sm:p-8 text-center relative z-10 transition-all duration-500 my-8">
         
         <!-- Header / Ikon Mahkota -->
         <div class="mb-2">
             <span class="inline-block text-4xl mb-1 animate-bounce">👑</span>
-            <span class="block text-xs uppercase tracking-widest text-pink-600 font-semibold">Special Apology</span>
+            <span class="block text-xs uppercase tracking-widest text-pink-600 font-semibold">Special Digital Apology</span>
         </div>
 
         <!-- Judul -->
         <h1 class="font-cursive text-4xl sm:text-5xl text-pink-700 mb-1">Princess Anna</h1>
         <p class="text-pink-800 font-medium text-sm sm:text-base mb-4">Yang Cantik Jelita & Paling Tersayang</p>
 
-        <!-- Kartu Pesan -->
-        <div id="mainContent">
-            <div class="bg-pink-50/80 rounded-2xl p-5 mb-6 border border-pink-100 shadow-inner">
-                <p id="apologyMessage" class="text-gray-700 leading-relaxed text-xs sm:text-sm">
+        <!-- Tahap 1: Kuis Romantis Pengganti Minigame -->
+        <div id="gameSection" class="bg-pink-50/90 rounded-2xl p-5 mb-4 border border-pink-200 shadow-inner text-left">
+            <div class="flex justify-between items-center mb-2">
+                <h3 class="font-bold text-pink-700 text-sm">Kuis Jawab Hati 💖</h3>
+                <span class="text-xs font-semibold text-pink-500" id="quizProgress">Pertanyaan 1/3</span>
+            </div>
+            <p class="text-xs text-gray-700 font-medium mb-3" id="quizQuestion">Jawab pertanyaan ini dulu ya, cantik! Siapa yang paling kangen kalau Princess Anna ngambek?</p>
+            <div class="space-y-2" id="quizOptions">
+                <button onclick="handleQuizAnswer(true)" class="w-full bg-white hover:bg-pink-100 text-pink-700 border border-pink-200 text-xs font-medium py-2.5 px-4 rounded-xl shadow-sm transition text-left">
+                    A. Jelas banget, kamu (yang bikin permohonan maaf ini) 🥺
+                </button>
+                <button onclick="handleQuizAnswer(false)" class="w-full bg-white hover:bg-pink-100 text-pink-700 border border-pink-200 text-xs font-medium py-2.5 px-4 rounded-xl shadow-sm transition text-left">
+                    B. Tukang ojek online langganan 🛵
+                </button>
+            </div>
+        </div>
+
+        <!-- Tahap 2: Kartu Pesan Utama (Terkunci Awalnya) -->
+        <div id="mainContent" class="opacity-40 pointer-events-none transition-all duration-500">
+            <div class="bg-pink-50/80 rounded-2xl p-4 mb-4 border border-pink-100 shadow-inner text-left">
+                <p id="apologyMessage" class="text-gray-700 leading-relaxed text-xs sm:text-sm mb-3">
                     "Duh, Yang Mulia Princess Anna... hamba mau minta maaf nih dari ujung rambut sampai ujung kaki atas kesalahan kemarin. Jangan ngambek lagi ya, cantik? Senyumanmu itu lho, bikin dunia rasanya kurang ceria kalau lagi cemberut. Maafin ya? 🥺"
                 </p>
+
+                <!-- Fitur Alasan Interaktif -->
+                <div class="border-t border-pink-200 pt-2">
+                    <p class="text-[11px] font-semibold text-pink-700 mb-1">💡 Kenapa Princess Anna Harus Maafin? (Klik untuk buka)</p>
+                    <div class="space-y-1" id="reasonsBox">
+                        <div onclick="revealReason(this, '1. Karena senyumanmu adalah sumber energi semesta! ✨')" class="bg-white/80 hover:bg-pink-100 p-2 rounded-lg text-xs text-pink-800 cursor-pointer border border-pink-100 transition">
+                            🎁 Alasan 1 (Klik disini)
+                        </div>
+                        <div onclick="revealReason(this, '2. Karena hamba siap traktir boba sepuasnya! 🧋')" class="bg-white/80 hover:bg-pink-100 p-2 rounded-lg text-xs text-pink-800 cursor-pointer border border-pink-100 transition">
+                            🎁 Alasan 2 (Klik disini)
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Tombol Interaktif -->
@@ -98,7 +138,7 @@
             </div>
         </div>
 
-        <!-- Area Kamera & Hasil Jepretan Photobox Pink Vintage -->
+        <!-- Tahap 3: Area Kamera & Hasil Jepretan Photobox Pink Vintage -->
         <div id="successArea" class="hidden mt-2 animate-fade-in">
             <h3 class="font-bold text-base text-pink-700 mb-1">Selfie dulu yuk 📸</h3>
             <p class="text-xs text-pink-600 mb-3">biar ketauan kalo udahh ga badmood lagi ✨</p>
@@ -132,13 +172,109 @@
         </div>
     </div>
 
-    <!-- Skrip JavaScript untuk Interaksi, Efek Cursor, Kamera, dan Audio -->
+    <!-- Skrip JavaScript Lengkap -->
     <script>
-        let stream = null;
-        let photoTaken = false;
-        let capturedDataUrl = "";
+        // Efek Suara Interaktif Menggunakan Web Audio API
+        function playSound(type) {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                osc.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
 
-        // Efek kursor cinta / emot ketika mouse digerakkan
+                if (type === 'pop') {
+                    osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.1);
+                    gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.1);
+                } else if (type === 'magic') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(523.25, audioCtx.currentTime);
+                    osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1);
+                    osc.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.2);
+                    gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.3);
+                }
+            } catch (e) {
+                console.log("Audio context diblokir browser sebelum interaksi.");
+            }
+        }
+
+        // Pembuatan Bintang Latar Belakang Romantis
+        const starContainer = document.getElementById('starContainer');
+        for (let i = 0; i < 20; i++) {
+            const star = document.createElement('div');
+            star.className = 'star text-pink-200 text-sm';
+            star.innerText = '✨';
+            star.style.top = Math.random() * 100 + '%';
+            star.style.left = Math.random() * 100 + '%';
+            star.style.animationDelay = (Math.random() * 3) + 's';
+            starContainer.appendChild(star);
+        }
+
+        // Logika Kuis Romantis (Pengganti Minigame)
+        let currentQuizStep = 1;
+        const quizData = [
+            {
+                q: "Pertanyaan 1/3: Siapa yang paling kangen kalau Princess Anna ngambek?",
+                optA: "A. Jelas banget, kamu (yang bikin website ini) 🥺",
+                optB: "B. Tukang ojek online langganan 🛵",
+                correct: true
+            },
+            {
+                q: "Pertanyaan 2/3: Kalau Princess Anna senyum lagi, dunia rasanya jadi...",
+                optA: "A. Biasa aja sih 🥱",
+                optB: "B. Jauh lebih cerah dan indah banget ✨",
+                correct: true
+            },
+            {
+                q: "Pertanyaan 3/3: Janji ya gak ngambek lama-lama lagi?",
+                optA: "A. Janji dong, asalkan ditraktir sesuatu 🧋",
+                optB: "B. Pikir-pikir dulu ya 😌",
+                correct: true
+            }
+        ];
+
+        function handleQuizAnswer(isCorrect) {
+            playSound('pop');
+            if (currentQuizStep < quizData.length) {
+                currentQuizStep++;
+                const data = quizData[currentQuizStep - 1];
+                document.getElementById('quizProgress').innerText = `Pertanyaan ${currentQuizStep}/3`;
+                document.getElementById('quizQuestion').innerText = data.q;
+                
+                const optionsContainer = document.getElementById('quizOptions');
+                optionsContainer.innerHTML = `
+                    <button onclick="handleQuizAnswer(true)" class="w-full bg-white hover:bg-pink-100 text-pink-700 border border-pink-200 text-xs font-medium py-2.5 px-4 rounded-xl shadow-sm transition text-left">
+                        ${data.optA}
+                    </button>
+                    <button onclick="handleQuizAnswer(true)" class="w-full bg-white hover:bg-pink-100 text-pink-700 border border-pink-200 text-xs font-medium py-2.5 px-4 rounded-xl shadow-sm transition text-left">
+                        ${data.optB}
+                    </button>
+                `;
+            } else {
+                // Kuis selesai, buka kunci pesan utama
+                playSound('magic');
+                document.getElementById('gameSection').innerHTML = `
+                    <div class="text-pink-700 font-bold text-center text-sm py-2">🎉 Yeay! Kuis Berhasil Dijawab! Hati Anna Terbuka 💖</div>
+                `;
+                const mainContent = document.getElementById('mainContent');
+                mainContent.classList.remove('opacity-40', 'pointer-events-none');
+            }
+        }
+
+        function revealReason(element, text) {
+            playSound('pop');
+            element.innerText = text;
+            element.classList.add('bg-pink-100', 'font-medium');
+        }
+
+        // Efek kursor cinta ketika mouse digerakkan
         let lastTime = 0;
         document.addEventListener('mousemove', (e) => {
             const currentTime = Date.now();
@@ -162,11 +298,11 @@
             }, 800);
         }
 
-        // Coba putar musik secara otomatis saat halaman dimuat
+        // Autoplay Musik dengan Fallback Interaksi Pertama
         window.addEventListener('DOMContentLoaded', () => {
             const music = document.getElementById('bgMusic');
             music.play().catch(error => {
-                console.log("Autoplay diblokir oleh browser sebelum ada interaksi pengguna:", error);
+                console.log("Autoplay diblokir browser, menunggu interaksi pengguna.");
                 document.body.addEventListener('click', function playAudioOnce() {
                     music.play();
                     document.body.removeEventListener('click', playAudioOnce);
@@ -175,14 +311,13 @@
         });
 
         async function acceptApology() {
+            playSound('magic');
             document.getElementById('mainContent').style.display = 'none';
             const successArea = document.getElementById('successArea');
             successArea.classList.remove('hidden');
 
             const music = document.getElementById('bgMusic');
-            music.play().catch(error => {
-                console.log("Pemutaran audio dicegah oleh browser:", error);
-            });
+            music.play().catch(error => console.log(error));
 
             try {
                 stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
@@ -194,10 +329,14 @@
             }
         }
 
+        let stream = null;
+        let photoTaken = false;
+        let capturedDataUrl = "";
+
         function takeSnapshot() {
+            playSound('pop');
             const video = document.getElementById('webcam');
             const canvas = document.getElementById('snapshotCanvas');
-            const context = canvas.getContext('2d');
 
             const videoWidth = video.videoWidth || 640;
             const videoHeight = video.videoHeight || 480;
@@ -266,6 +405,7 @@
         }
 
         async function retakePhoto() {
+            playSound('pop');
             const video = document.getElementById('webcam');
             const canvas = document.getElementById('snapshotCanvas');
 
@@ -287,6 +427,7 @@
         }
 
         function sendToWhatsApp() {
+            playSound('magic');
             const phoneNumber = "6285786243667";
             const messageText = "Hai Princess Anna! Nih foto selfie terbaru biar tau kalau aku udah gak badmood lagi. Maafin aku ya! 💖✨";
 
@@ -297,14 +438,14 @@
                 link.click();
             }
 
-            // Langsung membuka WhatsApp otomatis ke nomor yang dituju setelah foto terunduh
             setTimeout(() => {
                 const waUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(messageText)}`;
                 window.open(waUrl, '_blank');
-            }, 500);
+            }, 600);
         }
 
         function moveButton() {
+            playSound('pop');
             const btn = document.getElementById('thinkBtn');
             const x = Math.random() * 200 - 100;
             const y = Math.random() * 80 - 40;
