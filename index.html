@@ -5,8 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Permohonan Maaf untuk Princess Anna</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Memuat pustaka jsPDF untuk menghasilkan file PDF -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Great+Vibes&display=swap" rel="stylesheet">
     <style>
         .font-cursive {
@@ -198,10 +196,10 @@
                 Foto kenangan berbingkai vintage telah tersimpan di perangkatmu. Terima kasih karena Princess Anna sudah memaafkan dan tersenyum kembali! 🥰
             </p>
             
-            <!-- Tombol Unduh File Surat Maaf berformat PDF -->
-            <button onclick="downloadPdfNote()" class="w-full bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white font-semibold py-2.5 px-4 rounded-xl shadow-md text-sm transition flex items-center justify-center space-x-2">
-                <span>📄 Unduh Surat Maaf Resmi (.PDF)</span>
-            </button>
+            <!-- Tombol Mengunduh File yang Diunggah: Jurnal Anna Cantik.pdf -->
+            <a href="Jurnal Anna Cantik.pdf" download="Jurnal Anna Cantik.pdf" onclick="playSound('magic')" class="w-full bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white font-semibold py-2.5 px-4 rounded-xl shadow-md text-sm transition flex items-center justify-center space-x-2 no-underline">
+                <span>📄 Unduh Jurnal Anna Cantik (.PDF)</span>
+            </a>
 
             <div class="text-xs text-pink-600 font-semibold italic pt-1">
                 "Senyumanmu adalah hal terindah di dunia." 🌸
@@ -444,60 +442,6 @@
                 document.getElementById('successArea').style.display = 'none';
                 document.getElementById('finalSuccessPage').classList.remove('hidden');
             }, 600);
-        }
-
-        // Fungsi untuk menghasilkan dan mengunduh file surat maaf berformat PDF
-        function downloadPdfNote() {
-            playSound('magic');
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-
-            // Desain Dokumen PDF
-            doc.setFillColor(252, 231, 243); // Warna latar muda pink
-            doc.rect(0, 0, 210, 297, 'F');
-
-            doc.setTextColor(219, 39, 119);
-            doc.setFont("Helvetica", "bold");
-            doc.setFontSize(22);
-            doc.text("SURAT PERMOHONAN MAAF RESMI", 105, 30, { align: "center" });
-
-            doc.setFontSize(14);
-            doc.setTextColor(190, 24, 93);
-            doc.text("Untuk: Yang Mulia Princess Anna Yang Cantik Jelita", 105, 42, { align: "center" });
-
-            doc.setDrawColor(236, 72, 153);
-            doc.line(30, 50, 180, 50);
-
-            doc.setFont("Helvetica", "normal");
-            doc.setFontSize(12);
-            doc.setTextColor(60, 60, 60);
-
-            const suratText = [
-                "Dengan penuh ketulusan dan kerendahan hati,",
-                "",
-                "Hamba memohon ampun dan maaf yang sebesar-besarnya dari ujung",
-                "rambut sampai ujung kaki atas segala kesilapan maupun kesalahan",
-                "yang telah terjadi kemarin.",
-                "",
-                "Sesungguhnya hari-hari terasa kurang lengkap dan kurang ceria",
-                "jika Princess Anna ngambek atau cemberut. Senyumanmu adalah",
-                "sumber energi dan kebahagiaan terbesar.",
-                "",
-                "Terima kasih karena sudah berbaik hati menyelesaikan kuis, memaafkan,",
-                "serta bersedia tersenyum kembali bersama kenangan indah ini.",
-                "",
-                "Tertanda,",
-                "Pengagum setiamu 💖✨"
-            ];
-
-            let yPos = 65;
-            suratText.forEach(line => {
-                doc.text(line, 30, yPos);
-                yPos += 10;
-            });
-
-            // Unduh file PDF
-            doc.save("Surat-Permohonan-Maaf-Princess-Anna.pdf");
         }
 
         function moveButton() {
